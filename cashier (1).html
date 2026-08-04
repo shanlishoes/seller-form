@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تایید درخواست‌های ویزیت — صندوقدار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b2a;
+    --paper:#f6f4ee;
+    --card:#ffffff;
+    --line:#dcd6c8;
+    --teal:#0f5c56;
+    --teal-deep:#0a3f3b;
+    --amber:#c98a2c;
+    --danger:#a63d33;
+    --success:#1e7a52;
+    --muted:#7a8482;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  .head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:22px;
+    border-bottom:2px solid var(--teal-deep);
+    padding-bottom:16px;
+  }
+  .head h1{font-size:22px;font-weight:800;margin:0;color:var(--teal-deep);letter-spacing:-0.3px;}
+  .head .tag{font-size:12px;color:var(--muted);margin-top:4px;font-weight:500;}
+  .badge-num{font-family:'Vazirmatn';font-weight:700;font-size:13px;background:var(--teal-deep);color:#fff;padding:6px 14px;border-radius:100px;white-space:nowrap;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(20,40,38,0.04);
+  }
+
+  /* ---- login gate ---- */
+  #loginBox{max-width:380px;margin:60px auto;}
+  #loginBox h2{font-size:15px;font-weight:700;color:var(--teal-deep);margin:0 0 14px;text-align:center;}
+  #loginBox input{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:inherit;font-size:15px;margin-bottom:10px;text-align:center;letter-spacing:2px;
+  }
+  #loginBox input:focus{outline:none;border-color:var(--teal);}
+  #loginErr{color:var(--danger);font-size:12.5px;text-align:center;min-height:16px;margin-bottom:6px;}
+
+  button.act{font-family:inherit;font-size:14px;font-weight:700;border:none;border-radius:10px;padding:13px 22px;cursor:pointer;transition:.15s;width:100%;}
+  .btn-main{background:var(--teal-deep);color:#fff;}
+  .btn-main:hover{background:var(--teal);}
+  .btn-main:disabled{background:#b8bcb9;cursor:not-allowed;}
+
+  /* ---- request cards ---- */
+  .req-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,40,38,0.04);
+  }
+  .req-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .req-title{font-weight:700;font-size:15px;color:var(--teal-deep);}
+  .req-date{font-size:12px;color:var(--muted);font-weight:600;}
+  .req-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;margin-bottom:12px;}
+  @media (max-width:520px){.req-grid{grid-template-columns:1fr;}}
+  .req-grid .lbl{color:var(--muted);font-weight:600;font-size:11.5px;display:block;margin-bottom:2px;}
+  .req-grid .val{font-weight:600;}
+  .status-pill{display:inline-block;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700;}
+  .status-ok{background:#e9f6ef;color:var(--success);}
+  .status-fail{background:#fbebe9;color:var(--danger);}
+  .barcodes-list{font-size:12.5px;color:var(--ink);}
+
+  .req-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn-approve{background:var(--success);color:#fff;flex:1;font-weight:700;border:none;border-radius:9px;padding:11px;cursor:pointer;font-family:inherit;font-size:13.5px;}
+  .btn-reject{background:var(--danger);color:#fff;flex:1;font-weight:700;border:none;border-radius:9px;padding:11px;cursor:pointer;font-family:inherit;font-size:13.5px;}
+  .btn-approve:hover{filter:brightness(1.05);}
+  .btn-reject:hover{filter:brightness(1.05);}
+  .btn-approve:disabled, .btn-reject:disabled{background:#b8bcb9;cursor:not-allowed;}
+
+  .note-row{display:none;margin-top:10px;gap:8px;}
+  .note-row.show{display:flex;}
+  .note-row input{flex:1;padding:9px 10px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;}
+  .note-row button{white-space:nowrap;padding:9px 14px;border:none;border-radius:8px;background:var(--danger);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;}
+
+  .amount-row{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+  .amount-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:6px;}
+  .amount-input{width:100%;padding:10px 12px;border:1.5px solid var(--amber);border-radius:8px;font-family:inherit;font-size:14px;text-align:left;}
+  .amount-input:focus{outline:none;border-color:var(--teal);}
+
+  .empty-note{text-align:center;color:var(--muted);font-size:13.5px;padding:40px 0;}
+  .refresh-row{display:flex;justify-content:flex-end;margin-bottom:14px;}
+  .refresh-btn{background:#fff;border:1.5px solid var(--line);color:var(--teal-deep);border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
+  .refresh-btn:hover{border-color:var(--teal);}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal-deep);color:#fff;padding:12px 22px;border-radius:100px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--danger);}
+
+  details.settings{border:1.5px dashed var(--line);border-radius:10px;padding:12px 16px;margin-bottom:18px;background:#fbfaf5;}
+  details.settings summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--teal-deep);}
+  .settings-body{margin-top:12px;}
+  .settings-body p{font-size:12px;color:var(--muted);line-height:1.9;margin:6px 0;}
+  .settings-row{display:flex;gap:8px;margin-top:8px;}
+  .settings-row input{flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:13px;}
+  .settings-row button{white-space:nowrap;padding:10px 18px;border:none;border-radius:9px;background:var(--teal-deep);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;}
+.cashier-branches{display:flex;gap:8px;margin:0 0 10px}.cashier-branches button{flex:1;padding:11px;border:1.5px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}.cashier-branches button.selected{background:var(--teal);color:#fff;border-color:var(--teal)}.small-note{color:var(--muted);font-size:13px}.live-note{color:var(--success);font-size:13px;margin:8px 0}.barcode-line{display:flex;gap:15px;padding:5px 0;font-size:16px}.barcode-line b{direction:ltr}.barcode-block{grid-column:1/-1}.history{margin-top:25px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:10px}.hist{display:flex;gap:7px;margin:8px 0}.hist input{min-width:0;padding:7px}.hist button{padding:7px;background:var(--teal);color:#fff;border:0;border-radius:6px}</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>تایید درخواست‌های ویزیت</h1>
+      <div class="tag">پنل صندوقدار — بررسی و تایید نهایی درخواست‌های فروشندگان</div>
+    </div>
+    <div class="badge-num" id="countBadge" style="display:none;">۰ در انتظار</div>
+  </div>
+
+<!-- Login gate -->
+  <div class="card" id="loginBox">
+    <h2>ورود اولیه صندوقدار</h2><p class="small-note">این اطلاعات فقط یک‌بار در همین گوشی ذخیره می‌شود.</p><input type="text" id="cashierName" placeholder="نام صندوقدار"><div class="cashier-branches" id="cashierBranch"><button type="button" data-v="شوط">شوط</button><button type="button" data-v="ارومیه">ارومیه</button></div>
+    <input type="password" id="pwdInput" placeholder="رمز عبور" inputmode="numeric">
+    <div id="loginErr"></div>
+    <button class="act btn-main" id="loginBtn">ورود</button>
+  </div>
+
+  <!-- Requests list (hidden until login) -->
+  <div id="listArea" style="display:none;">
+    <div class="live-note">● لیست به‌صورت خودکار به‌روز می‌شود</div>
+    <div id="requestsWrap"></div>
+    <div class="empty-note" id="emptyNote" style="display:none;">هیچ درخواست در انتظار تاییدی وجود ندارد.</div>
+    <details class="history"><summary>سابقه امروز و ویرایش اکسل</summary><div id="historyWrap">در حال دریافت…</div></details>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwsfq0j8HLGm1kOTOzJwWC4H11_UCYPDU7lQtpNjCwqWk_z-pnF3c0zPf0AdVSmV0jf9w/exec";
+const PROFILE_KEY='cashier:profile'; let selectedBranch=''; let SCRIPT_URL=DEFAULT_SCRIPT_URL,CASHIER_PWD='',timer,lastIds='',editingRequest=false;
+function toast(m,b){const x=document.getElementById('toast');x.textContent=m;x.classList.toggle('err',!!b);x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2600)}
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function fetchPending(p=CASHIER_PWD){try{let d=await (await fetch(SCRIPT_URL+'?action=getPending&password='+encodeURIComponent(p))).json();if(d.status==='error')return false; if(editingRequest)return true; const ids=d.requests.map(x=>x.id).join(',');if(lastIds&&ids!==lastIds){beep();toast('درخواست جدید دریافت شد');}lastIds=ids;render(d.requests||[]);loadHistory();return true}catch(e){return false}}
+function beep(){try{let a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.08;o.start();o.stop(a.currentTime+.2)}catch(e){}}
+function render(list){let w=document.getElementById('requestsWrap');w.innerHTML='';document.getElementById('countBadge').textContent=list.length+' در انتظار';document.getElementById('emptyNote').style.display=list.length?'none':'block';list.forEach(r=>{let b=(r.barcodes||[]).map(x=>`<div class="barcode-line"><b>${esc(x.code)}</b><span>تعداد: ${esc(x.qty||'—')}</span></div>`).join('')||'—';let c=document.createElement('div');c.className='req-card';c.innerHTML=`<div class="req-top"><div class="req-title">${esc(r.customer)} — ${esc(r.city||'')}</div><div class="req-date">${esc(r.date)}</div></div><div class="req-grid"><div><span class="lbl">شعبه</span><span class="val">${esc(r.branch)}</span></div><div><span class="lbl">فروشنده</span><span class="val">${esc(r.seller)}</span></div><div class="barcode-block"><span class="lbl">بارکدها و تعداد</span>${b}</div><div><span class="lbl">نتیجه</span><span class="status-pill ${r.status==='موفق'?'status-ok':'status-fail'}">${esc(r.status)}</span></div>${r.reason?`<div><span class="lbl">دلیل</span>${esc(r.reason)}</div>`:''}</div><div class="note-row show" data-id="${r.id}"><input type="text" lang="fa" placeholder="یادداشت / سایر"></div><div class="amount-row" data-id="${r.id}"><label>مبلغ کل فاکتور</label><input class="amount-input" inputmode="numeric" pattern="[0-9]*" dir="ltr" placeholder="1,250,000"></div><div class="req-actions"><button class="btn-approve" data-id="${r.id}">تایید نهایی</button><button class="btn-reject" data-id="${r.id}">رد درخواست</button></div>`;w.append(c)});w.querySelectorAll('.amount-input').forEach(i=>i.oninput=()=>{let d=i.value.replace(/[^0-9]/g,'');i.value=d?Number(d).toLocaleString('en-US'):''});w.querySelectorAll('.btn-approve').forEach(x=>x.onclick=()=>decide(x.dataset.id,'approve'));w.querySelectorAll('.btn-reject').forEach(x=>x.onclick=()=>decide(x.dataset.id,'reject'))}
+async function decide(id,action){if(action==='reject'){ const card=document.querySelector(`.btn-reject[data-id="${id}"]`)?.closest('.req-card'); if(card)card.remove(); toast('درخواست رد شد'); fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,id,note:'',amount:'',password:CASHIER_PWD})}).then(()=>fetchPending()); return;}let note=document.querySelector(`.note-row[data-id="${id}"] input`).value.trim(),amount=action==='approve'?document.querySelector(`.amount-row[data-id="${id}"] input`).value:'';if(action==='approve'&&!amount){toast('مبلغ فاکتور الزامی است',1);return}let res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,id,note,amount,password:CASHIER_PWD})});let d=await res.json();if(d.status==='success'){toast(action==='approve'?'تایید و ثبت در اکسل انجام شد ✓':'درخواست رد شد');fetchPending()}else toast(d.message||'خطا',1)}
+async function loadHistory(){try{let d=await(await fetch(SCRIPT_URL+'?action=getDailyHistory&password='+encodeURIComponent(CASHIER_PWD))).json(),w=document.getElementById('historyWrap');if(!d.rows?.length){w.textContent='امروز رکورد تاییدشده‌ای نیست.';return}w.innerHTML=d.rows.map(x=>`<div class="hist" data-row="${x.sheetRow}"><input value="${esc(x.values[3])}" title="مشتری"><input value="${esc(x.values[19])}" inputmode="numeric" title="مبلغ"><button>ذخیره ویرایش</button></div>`).join('');w.querySelectorAll('button').forEach(b=>b.onclick=async()=>{let p=b.parentElement,row=+p.dataset.row,old=d.rows.find(x=>x.sheetRow===row).values.slice();old[3]=p.children[0].value;old[19]=p.children[1].value.replace(/\D/g,'');let z=await(await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'editFinal',password:CASHIER_PWD,sheetRow:row,values:old})})).json();toast(z.status==='success'?'اکسل ویرایش شد ✓':'خطا',z.status!=='success')})}catch(e){}}
+function enter(){let pwd=document.getElementById('pwdInput').value,name=document.getElementById('cashierName').value.trim(),branch=selectedBranch;if(!pwd||!name||!branch){document.getElementById('loginErr').textContent='نام، شعبه و رمز را وارد کنید';return}fetchPending(pwd).then(ok=>{if(!ok){document.getElementById('loginErr').textContent='رمز نادرست است یا اتصال برقرار نشد';return}CASHIER_PWD=pwd;localStorage.setItem(PROFILE_KEY,JSON.stringify({pwd,name,branch}));document.getElementById('loginBox').style.display='none';document.getElementById('listArea').style.display='block';document.getElementById('countBadge').style.display='inline-block';timer=setInterval(()=>fetchPending(),5000)})}
+document.querySelectorAll('#cashierBranch button').forEach(b=>b.onclick=()=>{selectedBranch=b.dataset.v;document.querySelectorAll('#cashierBranch button').forEach(x=>x.classList.toggle('selected',x===b))});
+document.getElementById('loginBtn').onclick=enter;document.getElementById('pwdInput').onkeydown=e=>e.key==='Enter'&&enter();
+document.addEventListener('focusin',e=>{if(e.target.closest('#requestsWrap')) editingRequest=true});
+document.addEventListener('focusout',e=>{if(e.target.closest('#requestsWrap')) setTimeout(()=>editingRequest=!!document.activeElement.closest?.('#requestsWrap'),150)});
+(async()=>{let x;try{x=JSON.parse(localStorage.getItem(PROFILE_KEY))}catch(e){}if(x?.pwd){CASHIER_PWD=x.pwd;let ok=await fetchPending();if(ok){document.getElementById('loginBox').style.display='none';document.getElementById('listArea').style.display='block';document.getElementById('countBadge').style.display='inline-block';timer=setInterval(()=>fetchPending(),5000)}}})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a25ef4afaba80e0f',t:'MTc4NTg2MTEyMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
