@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تایید درخواست‌های ویزیت — صندوقدار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b2a;
+    --paper:#f6f4ee;
+    --card:#ffffff;
+    --line:#dcd6c8;
+    --teal:#0f5c56;
+    --teal-deep:#0a3f3b;
+    --amber:#c98a2c;
+    --danger:#a63d33;
+    --success:#1e7a52;
+    --muted:#7a8482;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  .head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:22px;
+    border-bottom:2px solid var(--teal-deep);
+    padding-bottom:16px;
+  }
+  .head h1{font-size:22px;font-weight:800;margin:0;color:var(--teal-deep);letter-spacing:-0.3px;}
+  .head .tag{font-size:12px;color:var(--muted);margin-top:4px;font-weight:500;}
+  .badge-num{font-family:'Vazirmatn';font-weight:700;font-size:13px;background:var(--teal-deep);color:#fff;padding:6px 14px;border-radius:100px;white-space:nowrap;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(20,40,38,0.04);
+  }
+
+  /* ---- login gate ---- */
+  #loginBox{max-width:380px;margin:60px auto;}
+  #loginBox h2{font-size:15px;font-weight:700;color:var(--teal-deep);margin:0 0 14px;text-align:center;}
+  #loginBox input{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:inherit;font-size:15px;margin-bottom:10px;text-align:center;letter-spacing:2px;
+  }
+  #loginBox input:focus{outline:none;border-color:var(--teal);}
+  #loginErr{color:var(--danger);font-size:12.5px;text-align:center;min-height:16px;margin-bottom:6px;}
+
+  button.act{font-family:inherit;font-size:14px;font-weight:700;border:none;border-radius:10px;padding:13px 22px;cursor:pointer;transition:.15s;width:100%;}
+  .btn-main{background:var(--teal-deep);color:#fff;}
+  .btn-main:hover{background:var(--teal);}
+  .btn-main:disabled{background:#b8bcb9;cursor:not-allowed;}
+
+  /* ---- request cards ---- */
+  .req-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,40,38,0.04);
+  }
+  .req-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .req-title{font-weight:700;font-size:15px;color:var(--teal-deep);}
+  .req-date{font-size:12px;color:var(--muted);font-weight:600;}
+  .req-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;margin-bottom:12px;}
+  @media (max-width:520px){.req-grid{grid-template-columns:1fr;}}
+  .req-grid .lbl{color:var(--muted);font-weight:600;font-size:11.5px;display:block;margin-bottom:2px;}
+  .req-grid .val{font-weight:600;}
+  .status-pill{display:inline-block;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700;}
+  .status-ok{background:#e9f6ef;color:var(--success);}
+  .status-fail{background:#fbebe9;color:var(--danger);}
+  .barcodes-list{font-size:12.5px;color:var(--ink);}
+
+  .req-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn-approve{background:var(--success);color:#fff;flex:1;font-weight:700;border:none;border-radius:9px;padding:11px;cursor:pointer;font-family:inherit;font-size:13.5px;}
+  .btn-reject{background:var(--danger);color:#fff;flex:1;font-weight:700;border:none;border-radius:9px;padding:11px;cursor:pointer;font-family:inherit;font-size:13.5px;}
+  .btn-approve:hover{filter:brightness(1.05);}
+  .btn-reject:hover{filter:brightness(1.05);}
+  .btn-approve:disabled, .btn-reject:disabled{background:#b8bcb9;cursor:not-allowed;}
+
+  .note-row{display:none;margin-top:10px;gap:8px;}
+  .note-row.show{display:flex;}
+  .note-row input{flex:1;padding:9px 10px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;}
+  .note-row button{white-space:nowrap;padding:9px 14px;border:none;border-radius:8px;background:var(--danger);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;}
+
+  .amount-row{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+  .amount-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:6px;}
+  .amount-input{width:100%;padding:10px 12px;border:1.5px solid var(--amber);border-radius:8px;font-family:inherit;font-size:14px;text-align:left;}
+  .amount-input:focus{outline:none;border-color:var(--teal);}
+
+  .empty-note{text-align:center;color:var(--muted);font-size:13.5px;padding:40px 0;}
+  .refresh-row{display:flex;justify-content:flex-end;margin-bottom:14px;}
+  .refresh-btn{background:#fff;border:1.5px solid var(--line);color:var(--teal-deep);border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
+  .refresh-btn:hover{border-color:var(--teal);}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal-deep);color:#fff;padding:12px 22px;border-radius:100px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--danger);}
+
+  details.settings{border:1.5px dashed var(--line);border-radius:10px;padding:12px 16px;margin-bottom:18px;background:#fbfaf5;}
+  details.settings summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--teal-deep);}
+  .settings-body{margin-top:12px;}
+  .settings-body p{font-size:12px;color:var(--muted);line-height:1.9;margin:6px 0;}
+  .settings-row{display:flex;gap:8px;margin-top:8px;}
+  .settings-row input{flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:13px;}
+  .settings-row button{white-space:nowrap;padding:10px 18px;border:none;border-radius:9px;background:var(--teal-deep);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>تایید درخواست‌های ویزیت</h1>
+      <div class="tag">پنل صندوقدار — بررسی و تایید نهایی درخواست‌های فروشندگان</div>
+    </div>
+    <div class="badge-num" id="countBadge" style="display:none;">۰ در انتظار</div>
+  </div>
+
+  <details class="settings" id="settingsBox">
+    <summary>⚙ تنظیمات اتصال به گوگل شیت</summary>
+    <div class="settings-body">
+      <p>همان آدرس Web App گوگل اپس‌اسکریپتی که برای فرم فروشنده استفاده کردید را اینجا هم وارد کنید.</p>
+      <div class="settings-row">
+        <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/XXXXX/exec">
+        <button id="saveSettingsBtn">ذخیره</button>
+      </div>
+      <p id="settingsStatus"></p>
+    </div>
+  </details>
+
+  <!-- Login gate -->
+  <div class="card" id="loginBox">
+    <h2>برای مشاهده درخواست‌ها رمز صندوقدار را وارد کنید</h2>
+    <input type="password" id="pwdInput" placeholder="رمز عبور" inputmode="numeric">
+    <div id="loginErr"></div>
+    <button class="act btn-main" id="loginBtn">ورود</button>
+  </div>
+
+  <!-- Requests list (hidden until login) -->
+  <div id="listArea" style="display:none;">
+    <div class="refresh-row">
+      <button class="refresh-btn" id="refreshBtn">⟳ بروزرسانی لیست</button>
+    </div>
+    <div id="requestsWrap"></div>
+    <div class="empty-note" id="emptyNote" style="display:none;">هیچ درخواست در انتظار تاییدی وجود ندارد.</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY_CFG = "config:scriptUrl";
+const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsfq0j8HLGm1kOTOzJwWC4H11_UCYPDU7lQtpNjCwqWk_z-pnF3c0zPf0AdVSmV0jf9w/exec";
+const SESSION_KEY_PWD = "session:cashierPwd";
+
+let SCRIPT_URL = '';
+let CASHIER_PWD = '';
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+async function getConfig(){
+  try{ return localStorage.getItem(STORAGE_KEY_CFG) || DEFAULT_SCRIPT_URL; }catch(e){ return DEFAULT_SCRIPT_URL; }
+}
+async function setConfig(url){
+  try{ localStorage.setItem(STORAGE_KEY_CFG, url); }catch(e){}
+}
+
+document.getElementById('saveSettingsBtn').addEventListener('click', async ()=>{
+  const val = document.getElementById('scriptUrlInput').value.trim();
+  if(!val){ showToast('آدرس را وارد کنید', true); return; }
+  await setConfig(val);
+  SCRIPT_URL = val;
+  document.getElementById('settingsStatus').textContent = 'ذخیره شد ✓';
+});
+
+/* ---------- Login ---------- */
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const pwd = document.getElementById('pwdInput').value;
+  if(!pwd){ document.getElementById('loginErr').textContent = 'رمز را وارد کنید'; return; }
+  if(!SCRIPT_URL){ document.getElementById('loginErr').textContent = 'ابتدا آدرس گوگل شیت را در بخش تنظیمات وارد کنید'; return; }
+
+  document.getElementById('loginBtn').disabled = true;
+  document.getElementById('loginBtn').textContent = 'در حال بررسی...';
+  const ok = await fetchPending(pwd);
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginBtn').textContent = 'ورود';
+
+  if(ok){
+    CASHIER_PWD = pwd;
+    try{ sessionStorage.setItem(SESSION_KEY_PWD, pwd); }catch(e){}
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('listArea').style.display = 'block';
+    document.getElementById('countBadge').style.display = 'inline-block';
+  } else {
+    document.getElementById('loginErr').textContent = 'رمز عبور نادرست است یا اتصال برقرار نشد';
+  }
+});
+
+document.getElementById('pwdInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', ()=> fetchPending(CASHIER_PWD));
+
+/* ---------- Fetch pending requests ---------- */
+async function fetchPending(pwd){
+  try{
+    const res = await fetch(SCRIPT_URL + '?action=getPending&password=' + encodeURIComponent(pwd));
+    const data = await res.json();
+    if(data.status === 'error') return false;
+    renderRequests(data.requests || []);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function renderRequests(list){
+  const wrap = document.getElementById('requestsWrap');
+  wrap.innerHTML = '';
+  document.getElementById('countBadge').textContent = `${list.length} در انتظار`;
+  document.getElementById('emptyNote').style.display = list.length ? 'none' : 'block';
+
+  list.forEach(req=>{
+    const barcodesTxt = (req.barcodes || []).filter(b=>b.code).map(b=>`${b.code}${b.qty?`(${b.qty})`:''}`).join('، ') || '—';
+    const statusOk = req.status === 'موفق';
+    const card = document.createElement('div');
+    card.className = 'req-card';
+    card.innerHTML = `
+      <div class="req-top">
+        <div class="req-title">${req.customer}${req.city ? ` — ${req.city}` : ''}</div>
+        <div class="req-date">${req.date}</div>
+      </div>
+      <div class="req-grid">
+        <div><span class="lbl">شعبه</span><span class="val">${req.branch}</span></div>
+        <div><span class="lbl">فروشنده</span><span class="val">${req.seller}</span></div>
+        <div><span class="lbl">بارکدها</span><span class="val barcodes-list">${barcodesTxt}</span></div>
+        <div><span class="lbl">نتیجه فروش</span><span class="status-pill ${statusOk?'status-ok':'status-fail'}">${statusOk?'✓ موفق':'✕ ناموفق'}</span></div>
+        ${req.reason ? `<div><span class="lbl">دلیل عدم فروش</span><span class="val">${req.reason}</span></div>` : ''}
+      </div>
+      <div class="note-row show" data-id="${req.id}">
+        <input type="text" placeholder="یادداشت (اختیاری — در ستون «سایر» ذخیره می‌شود)">
+      </div>
+      <div class="amount-row" data-id="${req.id}">
+        <label class="amount-lbl">مبلغ کل فاکتور (لاتین) — برای تایید الزامی است</label>
+        <input type="text" inputmode="numeric" class="amount-input" placeholder="مثلاً 1250000" dir="ltr">
+      </div>
+      <div class="req-actions">
+        <button class="btn-approve" data-id="${req.id}">تایید نهایی</button>
+        <button class="btn-reject" data-id="${req.id}">رد درخواست</button>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+
+  wrap.querySelectorAll('.amount-input').forEach(inp=>{
+    inp.addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g,''); });
+  });
+
+  wrap.querySelectorAll('.btn-approve').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-id');
+      const note = wrap.querySelector(`.note-row[data-id="${id}"] input`).value.trim();
+      const amountInput = wrap.querySelector(`.amount-row[data-id="${id}"] .amount-input`);
+      const amount = amountInput.value.trim();
+      if(!amount){
+        showToast('برای تایید، وارد کردن مبلغ کل فاکتور الزامی است', true);
+        amountInput.focus();
+        return;
+      }
+      decide(id, 'approve', note, amount);
+    });
+  });
+  wrap.querySelectorAll('.btn-reject').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const note = wrap.querySelector(`.note-row[data-id="${btn.getAttribute('data-id')}"] input`).value.trim();
+      decide(btn.getAttribute('data-id'), 'reject', note, '');
+    });
+  });
+}
+
+async function decide(id, action, note, amount){
+  const buttons = document.querySelectorAll(`[data-id="${id}"]`);
+  buttons.forEach(b=> { if(b.tagName === 'BUTTON') b.disabled = true; });
+  try{
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action, id, note, amount, password: CASHIER_PWD })
+    });
+    const data = await res.json();
+    if(data.status === 'success'){
+      showToast(action === 'approve' ? 'درخواست تایید و همراه با مبلغ فاکتور در Sheet1 ثبت شد ✓' : 'درخواست رد شد');
+      fetchPending(CASHIER_PWD);
+    } else {
+      showToast(data.message || 'خطا در ثبت تصمیم', true);
+      buttons.forEach(b=> { if(b.tagName === 'BUTTON') b.disabled = false; });
+    }
+  }catch(e){
+    showToast('اتصال برقرار نشد، دوباره تلاش کنید', true);
+    buttons.forEach(b=> { if(b.tagName === 'BUTTON') b.disabled = false; });
+  }
+}
+
+/* ---------- Init ---------- */
+(async function init(){
+  SCRIPT_URL = await getConfig();
+  document.getElementById('scriptUrlInput').value = SCRIPT_URL;
+
+  let savedPwd = '';
+  try{ savedPwd = sessionStorage.getItem(SESSION_KEY_PWD) || ''; }catch(e){}
+  if(savedPwd && SCRIPT_URL){
+    const ok = await fetchPending(savedPwd);
+    if(ok){
+      CASHIER_PWD = savedPwd;
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('listArea').style.display = 'block';
+      document.getElementById('countBadge').style.display = 'inline-block';
+    }
+  }
+})();
+</script>
+</body>
+</html>
