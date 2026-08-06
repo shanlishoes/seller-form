@@ -685,7 +685,7 @@ document.getElementById('retryBtn').addEventListener('click', async ()=>{
 
 
 /* ---------- Live daily dashboard and approval status ---------- */
-function apiDateToJalali_(value){const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return '';const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]+1));return `${d.getUTCFullYear()}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`}
+function apiDateToJalali_(value){const raw=String(value||''),m=raw.match(/^(\d{4})([-\/])(\d{2})\2(\d{2})/);if(!m)return '';if(m[2]==='/')return `${m[1]}/${m[3]}/${m[4]}`;const d=new Date(Date.UTC(+m[1],+m[3]-1,+m[4]+1));return `${d.getUTCFullYear()}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`}
 function paintDashboard_(visits,successful,total){const rate=visits?Math.round(successful*100/visits):0,avg=successful?total/successful:0;const html=`تعداد ویزیت امروز: <b>${visits}</b> · فروش موفق: <b>${successful}</b> · نرخ تبدیل: <b>${rate}%</b><div class="today-invoice-total">مبلغ کل فاکتورهای فروش: <strong>${total.toLocaleString('en-US')}</strong><br>میانگین فروش: <strong>${avg.toLocaleString('en-US',{maximumFractionDigits:0})}</strong></div>`;document.getElementById('dashboard').innerHTML=html;return html}
 async function loadDashboard(){
  const seller=getSellerValue(); if(!seller||!SCRIPT_URL)return;
@@ -730,5 +730,5 @@ function initVisitTabs(){renderVisitTabs();document.getElementById('f_customer')
   setInterval(()=>{ renderTable(); loadDashboard(); }, 3000);
 })();
 </script>
-<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script></body>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a271eb290f68bea6',t:'MTc4NjA1OTk2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
