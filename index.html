@@ -538,7 +538,7 @@ function getSellerValue(){
 
 /* ---------- Table render ---------- */
 async function renderTable(){
-  const list = await loadIndex();
+  const list = serverRecords || await loadIndex();
   const body = document.getElementById('recordsBody');
   body.innerHTML = '';
   document.getElementById('countBadge').textContent = `${list.length} ثبت شده`;
@@ -688,7 +688,7 @@ document.getElementById('retryBtn').addEventListener('click', async ()=>{
 async function loadDashboard(){
  const seller=getSellerValue(); if(!seller||!SCRIPT_URL)return;
  const box=document.getElementById('dashboard');
- try{const todayDate=`${todayJ.jy}/${String(todayJ.jm).padStart(2,'0')}/${String(todayJ.jd).padStart(2,'0')}`;const d=await (await fetch(SCRIPT_URL+'?action=getSellerStatus&seller='+encodeURIComponent(seller)+'&date='+encodeURIComponent(todayDate),{cache:'no-store'})).json();const local=await loadIndex();approvalMap={};local.forEach(rec=>{const match=(d.requests||[]).find(x=>String(x.id)===String(rec.id)||(x.date===rec.date&&x.customer===rec.customer&&x.branch===rec.branch));if(match)approvalMap[rec.id]=match.approval});renderTable();const visits=Number(d.daily?.visits||0),successful=Number(d.daily?.successful||0),total=Number(d.daily?.totalAmount||0),rate=visits?Math.round(successful*100/visits):0,avg=successful?total/successful:0;box.innerHTML=`تعداد ویزیت امروز: <b>${visits}</b> · فروش موفق: <b>${successful}</b> · نرخ تبدیل: <b>${rate}%</b><div class="today-invoice-total">مبلغ کل فاکتورهای فروش: <strong>${total.toLocaleString('en-US')}</strong><br>میانگین فروش: <strong>${avg.toLocaleString('en-US',{maximumFractionDigits:0})}</strong></div>`;}catch(e){box.textContent='اطلاعات عملکرد امروز دریافت نشد؛ اتصال را بررسی کنید.';}
+ try{const todayDate=`${todayJ.jy}/${String(todayJ.jm).padStart(2,'0')}/${String(todayJ.jd).padStart(2,'0')}`;const d=await (await fetch(SCRIPT_URL+'?action=getSellerStatus&seller='+encodeURIComponent(seller)+'&date='+encodeURIComponent(todayDate),{cache:'no-store'})).json();const local=await loadIndex();approvalMap={};(d.requests||[]).forEach(x=>approvalMap[x.id]=x.approval);serverRecords=(d.requests||[]).map(x=>({id:x.id,date:x.date,branch:x.branch,seller:x.seller,customer:x.customer,city:x.city,barcodes:x.barcodes||[],status:x.status,reason:x.reason,sent:true}));local.forEach(rec=>{const match=(d.requests||[]).find(x=>String(x.id)===String(rec.id)||(x.date===rec.date&&x.customer===rec.customer&&x.branch===rec.branch));if(match)approvalMap[rec.id]=match.approval});renderTable();const visits=Number(d.daily?.visits||0),successful=Number(d.daily?.successful||0),total=Number(d.daily?.totalAmount||0),rate=visits?Math.round(successful*100/visits):0,avg=successful?total/successful:0;box.innerHTML=`تعداد ویزیت امروز: <b>${visits}</b> · فروش موفق: <b>${successful}</b> · نرخ تبدیل: <b>${rate}%</b><div class="today-invoice-total">مبلغ کل فاکتورهای فروش: <strong>${total.toLocaleString('en-US')}</strong><br>میانگین فروش: <strong>${avg.toLocaleString('en-US',{maximumFractionDigits:0})}</strong></div>`;}catch(e){box.textContent='اطلاعات عملکرد امروز دریافت نشد؛ اتصال را بررسی کنید.';}
 }
 async function setupSellerProfile(){
  try{SELLER_PROFILE=JSON.parse(localStorage.getItem(SELLER_PROFILE_KEY)||'null')}catch(e){}
@@ -728,5 +728,5 @@ function initVisitTabs(){renderVisitTabs();document.getElementById('f_customer')
   setInterval(()=>{ renderTable(); loadDashboard(); }, 3000);
 })();
 </script>
-<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script></body>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2718a23fda2c499',t:'MTc4NjA1NTk4Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
