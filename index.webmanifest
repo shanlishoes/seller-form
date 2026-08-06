@@ -1,0 +1,1 @@
+{"name": "فرم ویزیت فروشنده", "short_name": "فرم فروش", "start_url": "/", "display": "standalone", "background_color": "#f6f4ee", "theme_color": "#0f5c56", "lang": "fa", "dir": "rtl", "icons": [{"src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}]}
