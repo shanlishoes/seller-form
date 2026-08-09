@@ -180,7 +180,6 @@
     <div style="display:flex;gap:8px;align-items:center"><div class="badge-num" id="countBadge">۰ ثبت شده</div><button id="logoutSeller" type="button" class="icon-btn" title="خروج از نام کاربری">خروج</button></div>
   </div>
   <div class="queue-card" id="queueCard" style="display:none"><div class="queue-head"><div><b>نوبت امروز شعبه</b><small id="queueHint"></small></div><button id="joinQueueBtn" type="button">ورود به صف</button></div><div id="queueList" class="queue-list"></div></div>
-  <div class="visit-tabs" id="visitTabs"></div>
 <div class="card">
     <h2>مشخصات بازدید</h2>
     <div class="field">
@@ -228,6 +227,7 @@
       <label><input type="radio" name="status" value="موفق" id="st_ok"><div class="opt-box ok">✓ فروش موفق</div></label>
       <label><input type="radio" name="status" value="ناموفق" id="st_fail"><div class="opt-box fail">✕ فروش ناموفق</div></label>
     </div>
+    <div id="visitTypeBlock" style="display:none;margin-top:14px;"><label style="margin-bottom:8px;display:block;">نوع فروش موفق</label><div class="status-toggle visit-types"><label><input type="radio" name="visitType" value="فروش عادی" checked><div class="opt-box ok">فروش عادی</div></label><label><input type="radio" name="visitType" value="تعویض فقط"><div class="opt-box">تعویض فقط (بدون پورسانت)</div></label><label><input type="radio" name="visitType" value="تعویض و خرید"><div class="opt-box ok">تعویض و خرید جدید</div></label></div></div>
 
     <div id="reasonsBlock">
       <label style="margin-bottom:10px;">دلیل عدم فروش (فقط یک مورد)</label>
@@ -443,8 +443,9 @@ async function loadReasons(){
 
 document.getElementById('st_ok').addEventListener('change', updateReasonsVisibility);
 document.getElementById('st_fail').addEventListener('change', updateReasonsVisibility);
+document.querySelectorAll('input[name=visitType]').forEach(x=>x.addEventListener('change',updateReasonsVisibility));
 updateReasonsVisibility();
-function updateReasonsVisibility(){ const ok=document.getElementById('st_ok').checked,fail=document.getElementById('st_fail').checked; document.getElementById('reasonsBlock').style.display=fail?'block':'none'; document.getElementById('itemsCard').style.display=ok?'block':'none'; }
+function updateReasonsVisibility(){ const ok=document.getElementById('st_ok').checked,fail=document.getElementById('st_fail').checked,type=document.querySelector('input[name=visitType]:checked')?.value||'فروش عادی'; document.getElementById('reasonsBlock').style.display=fail?'block':'none'; document.getElementById('visitTypeBlock').style.display=ok?'block':'none'; document.getElementById('itemsCard').style.display=(ok&&type!=='تعویض فقط')?'block':'none'; }
 
 /* ---------- Toast ---------- */
 function showToast(msg, isErr){
@@ -620,11 +621,13 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
     if(code) barcodes.push({code, qty});
   }
 
+  if(statusEl.value==='موفق' && document.querySelector('input[name=visitType]:checked')?.value==='تعویض فقط') barcodes.length=0;
+
   const rec = {
     id: editingRecordId || Date.now(),
     date: dateStr, jy, jm: jmNum, jd,
     branch: branchEl.value, seller, customer, city,
-    barcodes, status: statusEl.value, reason,
+    barcodes, status: statusEl.value, reason, visitType: statusEl.value==='موفق'?(document.querySelector('input[name=visitType]:checked')?.value||'فروش عادی'):'',
     sent: false
   };
 
@@ -659,7 +662,6 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   document.querySelectorAll('input[name=reason]').forEach(r=>r.checked=false);
   document.querySelectorAll('.reason-chip').forEach(c=>c.classList.remove('checked'));
   updateReasonsVisibility();
-  if(visitTabs.length){ visitTabs[activeVisit].data=readVisitForm(); visitTabs[activeVisit].label=`مشتری ${activeVisit+1}`; renderVisitTabs(); }
 });
 
 /* ---------- Retry pending ---------- */
@@ -726,12 +728,11 @@ function initVisitTabs(){renderVisitTabs();document.getElementById('f_customer')
   await loadSellers(false);
   await loadReasons();
   await loadCommissions();
-  initVisitTabs();
   renderTable();
   loadDashboard();
   setTimeout(()=>{loadQueue();if(!queueTimer)queueTimer=setInterval(loadQueue,3000)},800);
   setInterval(()=>{ renderTable(); loadDashboard(); }, 3000);
 })();
 </script>
-<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2854979ed3e0e4b',t:'MTc4NjI2MzA1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2858c708b808bf9',t:'MTc4NjI2NTc5Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
